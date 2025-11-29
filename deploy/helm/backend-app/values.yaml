@@ -1,6 +1,6 @@
 image:
   repository: "asia-south1-docker.pkg.dev/kxnwork/backend-app/backend-app"
-  tag: "<LATEST_SHA>"
+  tag: "latest"
 
 replicaCount: 1
 
