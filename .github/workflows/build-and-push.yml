@@ -26,8 +26,13 @@ jobs:
       - name: Auth to GCP via Workload Identity
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: "projects/382207431122/locations/global/workloadIdentityPools/github-pool/providers/github"
+          workload_identity_provider: "projects/382207431122/locations/global/workloadIdentityPools/github-wif-clean/providers/github-provider"
           service_account: "ci-backend-app@kxnwork.iam.gserviceaccount.com"
+          create_credentials_file: true
+          export_environment_variables: true
+          access_token_lifetime: 3600s
+          access_token_scopes: https://www.googleapis.com/auth/cloud-platform
+          cleanup_credentials: true
 
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
