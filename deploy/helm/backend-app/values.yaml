@@ -1,14 +1,8 @@
 image:
-  repository: asia-south1-docker.pkg.dev/kxnwork/backend-app/backend-app
+  repository: "asia-south1-docker.pkg.dev/kxnwork/backend-app/backend-app"
   tag: "latest"
 
 replicaCount: 1
 
 service:
-  type: ClusterIP
   port: 80
-
-vault:
-  enabled: true
-  role: backend-role
-  secretPath: kv/backend/config
