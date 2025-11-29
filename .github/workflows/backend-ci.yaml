@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -64,7 +65,8 @@ jobs:
 
       - name: Tag image for Artifact Registry
         run: |
-          docker tag ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }} \
+          docker tag \
+            ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }} \
             ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY_REPO }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }}
 
       - name: Push image to Artifact Registry
@@ -79,4 +81,3 @@ jobs:
           git config user.email "actions@github.com"
           git commit -am "Update image tag to ${{ steps.vars.outputs.tag }}" || echo "No changes to commit"
           git push || echo "No changes to push"
-
