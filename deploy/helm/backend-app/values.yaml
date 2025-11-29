@@ -1,8 +1,9 @@
 image:
   repository: "asia-south1-docker.pkg.dev/kxnwork/backend-app/backend-app"
-  tag: "latest"
+  tag: "0.0.0"   # will be auto-updated by GitHub Actions
 
 replicaCount: 1
 
 service:
   port: 80
+  targetPort: 8080
