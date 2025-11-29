@@ -1,0 +1,83 @@
+name: Build, Scan, and Push Backend Image
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch: {}
+
+env:
+  GCP_PROJECT_ID: kxnwork
+  GCP_REGION: asia-south1
+  ARTIFACT_REGISTRY_REPO: backend-app
+  IMAGE_NAME: backend-app
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-scan-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Auth to GCP via Workload Identity
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "projects/382207431122/locations/global/workloadIdentityPools/github-pool/providers/github"
+          service_account: "ci-backend-app@kxnwork.iam.gserviceaccount.com"
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Set image tag
+        id: vars
+        run: |
+          GIT_SHA=$(git rev-parse --short=7 HEAD)
+          echo "tag=${GIT_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -f docker/Dockerfile \
+            -t ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }} \
+            .
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_Linux-64bit.tar.gz
+          tar zxvf trivy_Linux-64bit.tar.gz
+          sudo mv trivy /usr/local/bin/
+
+      - name: Scan image with Trivy
+        run: |
+          trivy image --exit-code 1 --severity CRITICAL,HIGH \
+            ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }}
+
+      - name: Tag image for Artifact Registry
+        run: |
+          docker tag ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }} \
+            ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY_REPO }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }}
+
+      - name: Push image
+        run: |
+          docker push \
+            ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REGISTRY_REPO }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }}
+
+      - name: Update Helm values with new tag
+        run: |
+          sed -i "s/^  tag: \".*\"/  tag: \"${{ steps.vars.outputs.tag }}\"/" deploy/helm/backend-app/values.yaml
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git commit -am "Update image tag to ${{ steps.vars.outputs.tag }}" || echo "No changes to commit"
+          git push || echo "No changes to push"
