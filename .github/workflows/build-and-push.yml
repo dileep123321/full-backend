@@ -50,7 +50,7 @@ jobs:
         run: |
           docker build \
             --no-cache \
-            -f docker/Dockerfile \
+            -f Dockerfile\
             -t ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }} \
             .
 
