@@ -27,11 +27,5 @@ spec:
       containers:
         - name: backend
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["/bin/sh"]
-          args:
-            - -c
-            - |
-              echo "Starting app with absolute path"
-              /install/bin/gunicorn --bind 0.0.0.0:8080 src.main:app -k uvicorn.workers.UvicornWorker
           ports:
             - containerPort: 8080
