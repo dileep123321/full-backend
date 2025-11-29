@@ -18,13 +18,19 @@ spec:
         vault.hashicorp.com/role: "backend-role"
         vault.hashicorp.com/agent-inject-secret-config: "kv/backend/config"
         vault.hashicorp.com/agent-inject-template-config: |
-          DB_USER={{`{{ .Data.data.DB_USER }}`}}
-          DB_PASSWORD={{`{{ .Data.data.DB_PASSWORD }}`}}
-          API_KEY={{`{{ .Data.data.API_KEY }}`}}
+          DB_USER={{ .Data.data.DB_USER }}
+          DB_PASSWORD={{ .Data.data.DB_PASSWORD }}
+          API_KEY={{ .Data.data.API_KEY }}
     spec:
       serviceAccountName: backend-sa
       containers:
         - name: backend
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - |
+              export PATH="/install/bin:/home/sj5384763/.local/bin:/home/sj5384763/.pyenv/plugins/pyenv-virtualenv/shims:/home/sj5384763/.pyenv/shims:/home/sj5384763/.pyenv/bin:/home/sj5384763/.local/bin:/home/sj5384763/.local/bin:/opt/gradle/bin:/opt/maven/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/usr/local/node_packages/node_modules/.bin:/usr/local/rvm/bin:/home/sj5384763/.gems/bin:/usr/local/rvm/bin:/home/sj5384763/gopath/bin:/google/gopath/bin:/google/flutter/bin:/usr/local/nvm/versions/node/v24.11.1/bin"
+              exec gunicorn --bind 0.0.0.0:8080 src.main:app -k uvicorn.workers.UvicornWorker
           ports:
             - containerPort: 8080
