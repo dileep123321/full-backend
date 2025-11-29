@@ -1,6 +1,3 @@
 fastapi
 uvicorn[standard]
 gunicorn
-# add your other existing packages below
-gunicorn
-uvicorn[standard]
