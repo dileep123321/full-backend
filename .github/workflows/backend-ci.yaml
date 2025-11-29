@@ -46,7 +46,7 @@ jobs:
           GIT_SHA=$(git rev-parse --short=7 HEAD)
           echo "tag=${GIT_SHA}" >> "$GITHUB_OUTPUT"
 
-      - name: Build Docker image (FIXED PATH)
+      - name: Build Docker image (no cache)
         run: |
           docker build \
             --no-cache \
@@ -79,3 +79,4 @@ jobs:
           git config user.email "actions@github.com"
           git commit -am "Update image tag to ${{ steps.vars.outputs.tag }}" || echo "No changes to commit"
           git push || echo "No changes to push"
+
