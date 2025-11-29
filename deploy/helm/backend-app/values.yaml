@@ -1,6 +1,6 @@
 image:
   repository: "asia-south1-docker.pkg.dev/kxnwork/backend-app/backend-app"
-  tag: "a5e61f8"
+  tag: "stable-fix"
 
 replicaCount: 1
 
