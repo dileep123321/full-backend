@@ -56,18 +56,16 @@ jobs:
             -t ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }} \
             .
 
-      - name: Install Trivy
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget
-          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_Linux-64bit.tar.gz
-          tar zxvf trivy_Linux-64bit.tar.gz
-          sudo mv trivy /usr/local/bin/
-
+      # Use official Trivy GitHub Action instead of manual tarball install
       - name: Scan image with Trivy
-        run: |
-          trivy image --exit-code 1 --severity CRITICAL,HIGH \
-            ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }}
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.tag }}
+          format: 'table'
+          exit-code: '1'               # fail pipeline on HIGH/CRITICAL
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
 
       - name: Tag image for Artifact Registry
         run: |
