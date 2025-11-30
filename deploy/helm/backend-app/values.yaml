@@ -1,8 +1,9 @@
 image:
-  repository: "asia-south1-docker.pkg.dev/kxnwork/backend/backend"   # <— this is correct
-  tag: "0a7342b"   # <— your new image tag
+  repository: "asia-south1-docker.pkg.dev/kxnwork/backend-app/backend-app"
+  tag: "0a7342b"
 
 replicaCount: 1
 
 service:
   port: 8080
+
