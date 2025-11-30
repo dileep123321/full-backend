@@ -18,7 +18,7 @@ spec:
         vault.hashicorp.com/role: "backend-role"
 
         # 👇 Correct KV-v2 secret path
-        vault.hashicorp.com/agent-inject-secret-config: "kv/data/backend/config"
+        vault.hashicorp.com/agent-inject-secret-config: "kv/backend/config"
 
         # 👇 REQUIRED for KV v2 (without this you get <no value>)
         vault.hashicorp.com/kv-version: "2"
