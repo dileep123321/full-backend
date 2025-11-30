@@ -1,6 +1,6 @@
 image:
-  repository: "asia-south1-docker.pkg.dev/kxnwork/backend-app/backend-app"
-  tag: "stable-fix"
+  repository: "asia-south1-docker.pkg.dev/kxnwork/backend/backend"   # <— this is correct
+  tag: "v3"   # <— your new image tag
 
 replicaCount: 1
 
